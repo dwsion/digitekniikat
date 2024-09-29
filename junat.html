@@ -1,0 +1,171 @@
+<body>
+    <!-- Kellonäkymä -->
+    <div id="current-time" class="clock"></div>
+
+    <style>/* Yleinen ulkoasu */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Taulukkojen ulkoasu */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        thead {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        
+        /* Status-teksti: Myöhässä punaisella, aikataulussa vihreällä */
+        .late {
+            color: red;
+            font-weight: bold;
+        }
+        
+        .on-time {
+            color: green;
+            font-weight: bold;
+        }
+        /* Kellon tyyli */
+.clock {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgb(250, 215, 100);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}</style>
+
+    <h1>Tampereen kautta kulkevat junat</h1>
+
+    <!-- Taulukko junatiedoille -->
+    <table id="train-table">
+        <thead>
+            <tr>
+                <th>Saapuu</th>
+                <th>Lähtee</th>
+                <th>Juna</th>
+                <th>Lähtöasema</th>
+                <th>Raide</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="train-info-container">
+            <!-- Junatiedot lisätään tänne -->
+        </tbody>
+    </table>
+
+    <script>
+        // Aseman lyhenteet -> Kaupunkien nimet
+        const stationNames = {
+            "HKI": "Helsinki",
+            "TPE": "Tampere",
+            "TKU": "Turku",
+            "OL": "Oulu",
+            "JY": "Jyväskylä"
+        };
+
+        // Kontaineri junatiedoille
+        const trainContainer = document.getElementById('train-info-container');
+
+        // Hakee tiedot API:sta
+        fetch('https://rata.digitraffic.fi/api/v1/live-trains/station/tpe?departing_trains=10&include_nonstopping=false')
+            .then(response => response.json())
+            .then(data => {
+                const arrivalTrains = []; // Kontaineri saapuville junille
+
+                // Käy kaikki junat läpi
+                for (var i = 0; i < data.length; i++) {
+                    var train = data[i];
+
+                    // Tampereen saapumisrivi
+                    for (var j = 0; j < train.timeTableRows.length; j++) {
+                        if (train.timeTableRows[j].stationShortCode == "TPE" && train.timeTableRows[j].type == "ARRIVAL") {
+                            var scheduledTime = train.timeTableRows[j].scheduledTime;
+                            var actualTime = train.timeTableRows[j].actualTime || "Ei saatavilla";
+                            var differenceInMinutes = train.timeTableRows[j].differenceInMinutes || 0;
+                            var track = train.timeTableRows[j].commercialTrack || "Ei tietoa";
+
+                            // Myöhässä-teksti
+                            var status = differenceInMinutes > 0 ? `Myöhässä ${differenceInMinutes} min` : "Aikataulussa";
+                            var statusClass = differenceInMinutes > 0 ? 'late' : 'on-time';
+
+                            
+                            arrivalTrains.push({
+                                scheduledTime,
+                                actualTime,
+                                trainType: train.trainType,
+                                trainNumber: train.trainNumber,
+                                track,
+                                status,
+                                statusClass,
+                            });
+                            break; 
+                        }
+                    }
+                }
+
+                
+
+                // Lisää järjestetyt junat taulukkoon
+                arrivalTrains.forEach(train => {
+                    const row = `
+                        <tr>
+                            <td>${train.scheduledTime.substr(11, 5)}</td>
+                            <td>${train.actualTime.substr(11, 5)}</td>
+                            <td>${train.trainType} ${train.trainNumber}</td>
+                            <td>${stationNames["TPE"]}</td>
+                            <td>${train.track}</td>
+                            <td class="${train.statusClass}">${train.status}</td>
+                        </tr>
+                    `;
+                    trainContainer.innerHTML += row;
+                });
+            })
+            .catch(error => {
+                console.error('Virhe haettaessa junan tietoja:', error);
+            });
+
+        // Funktio, joka päivittää ajan
+        function updateClock() {
+            var now = new Date();
+            var hours = now.getHours().toString().padStart(2, '0');
+            var minutes = now.getMinutes().toString().padStart(2, '0');
+            var seconds = now.getSeconds().toString().padStart(2, '0');
+            var currentTime = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('current-time').textContent = currentTime;
+        }
+
+        // Päivitetään kello joka sekunti
+        setInterval(updateClock, 1000);
+        updateClock(); // Kutsutaan heti, että ei tarvitse odottaa ensimmäistä sekuntia
+    </script>
+</body>
+</html>

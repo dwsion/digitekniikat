@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON-datan käsittely</title>
+
+
+    <style>
+        /* Tyylitellään säätietokontteja */
+        .saatiedot {
+            display: flex; /* Käytetään flexboxia */
+            justify-content: space-around; /* Tasataan tilaa */
+            margin: 20px; /* Marginaali */
+        }
+        .kaupunki {
+            border: 1px solid #ccc; /* Kehys */
+            padding: 10px; /* Sisäinen tyhjennys */
+            border-radius: 8px; /* Kulmien pyöristys */
+            width: 45%; /* Leveys */
+            text-align: center; /* Keskitetään teksti */
+        }
+        img {
+            max-width: 100%; /* Kuvan koko */
+            height: auto; /* Kuva mukautuu */
+        }
+    </style>
+</head>
+<body>
+
+    <nav></nav>
+        <ul>
+            <li><a href="json1_tehtävä.html">Tehtävä 1</a></li>
+            <li><a href="toteutus.html">Toteutus</a></li>
+            <li><a href="tapahtumat.html">Tapahtumat</a></li>
+            <li><a href="saa.html">Sää</a></li>
+            <li><a href="liikennekamera.html">Liikennekamera</a></li>
+            <li><a href="junat.html">Junat</a></li>
+        </ul>
+    </nav>
+
+    <h1>Säätiedot</h1>
+    <div class="saatiedot">
+        <div id="helsinki" class="kaupunki"></div> <!-- Helsingin tiedot -->
+        <div id="tampere" class="kaupunki"></div> <!-- Tampereen tiedot -->
+    </div>
+
+    <script>
+        // Haetaan Helsingin säätiedot
+        fetch('https://api.openweathermap.org/data/2.5/weather?lang=fi&q=helsinki&units=metric&APPID=665ecd56dfc08dbb50feb8b8f5034e28')
+        .then(function (response) {
+            return response.json(); // Muunnetaan vastaus JSON-muotoon
+        })
+        .then(function (responseJson) {
+            saa(responseJson, 'helsinki'); // Kutsutaan saa-funktiota Helsingin tiedoille
+        })
+        .catch(function (error) {
+            document.getElementById("helsinki").innerHTML = "<p>Tietoa ei pystytä hakemaan Helsingistä</p>";
+        });
+
+        // Haetaan Tampereen säätiedot
+        fetch('https://api.openweathermap.org/data/2.5/weather?lang=fi&q=tampere&units=metric&APPID=665ecd56dfc08dbb50feb8b8f5034e28')
+        .then(function (response) {
+            return response.json(); // Muunnetaan vastaus JSON-muotoon
+        })
+        .then(function (responseJson) {
+            saa(responseJson, 'tampere'); // Kutsutaan saa-funktiota Tampereen tiedoille
+        })
+        .catch(function (error) {
+            document.getElementById("tampere").innerHTML = "<p>Tietoa ei pystytä hakemaan Tampereelta</p>";
+        });
+
+        // Funktio säätietojen käsittelyyn ja tulostamiseen
+        function saa(data, kaupunki) {
+            var teksti = ""; // määritellään muuttuja, johon tulostettava tieto kerätään
+            
+            // Otsikkotiedon hakeminen ja sijoittaminen h1-elementtiin
+            teksti += "<h2>" + data.name + "</h2>"; // Kaupunki
+            
+            // Sään kuvaus
+            teksti += "<p>Säätila: " + data.weather[0].description + "</p>"; 
+            
+            // Lämpötila
+            teksti += "<p>Lämpötila: " + data.main.temp + " &deg;C</p>"; 
+            
+            // Tuulen nopeus
+            teksti += "<p>Tuulen nopeus: " + data.wind.speed + " m/s</p>"; 
+            
+            // Sään kuvan URL
+            var kuva = 'http://openweathermap.org/img/w/' + data.weather[0].icon + '.png'; 
+            teksti += "<p><img src='" + kuva + "' alt='sään kuva'></p>"; 
+
+            // Tekstin tulostus
+            document.getElementById(kaupunki).innerHTML = teksti; // Lisää tulosteen div-elementtiin
+        }
+    </script>
+
+</body>
+</html>
+
+
+
+
+    </body>
+
+</html>

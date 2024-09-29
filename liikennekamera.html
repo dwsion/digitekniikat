@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toteutuksen tiedot</title>
+
+    <link rel="stylesheet" href="tyyli.css">
+
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="json1_tehtävä.html">Tehtävä 1</a></li>
+            <li><a href="toteutus.html">Toteutus</a></li>
+            <li><a href="tapahtumat.html">Tapahtumat</a></li>
+            <li><a href="saa.html">Sää</a></li>
+            <li><a href="liikennekamera.html">Liikennekamera</a></li>
+            <li><a href="junat.html">Junat</a></li>
+        </ul>
+    </nav>
+
+    <h1>Liikennekamerat matkalla Tampereelle</h1>
+    <div class="camera-container" id="camera-container">
+    </div>
+
+
+    <script>
+        // Liikennekameroiden tiedot
+        const cameraData = [
+            { id: 'C0450701', url: 'https://weathercam.digitraffic.fi/C0450701.jpg' },
+            { id: 'C0450702', url: 'https://weathercam.digitraffic.fi/C0450702.jpg' },
+            { id: 'C0450703', url: 'https://weathercam.digitraffic.fi/C0450703.jpg' },
+            { id: 'C0450704', url: 'https://weathercam.digitraffic.fi/C0450704.jpg' },
+        ];
+
+        // Kontaineri, johon kuvat ja aikaleimat lisätään
+        const cameraContainer = document.getElementById('camera-container');
+
+        // Hakee tiedot API:sta
+        fetch('https://tie.digitraffic.fi/api/weathercam/v1/stations/C04507/data')
+            .then(response => response.json())
+            .then(data => {
+                const cameraPresets = data.presets; // Kamerakuvat ja mitattu aika API:sta
+
+                // Käydään läpi kamerakuvat for-silmukalla
+                for (var i = 0; i < cameraData.length; i++) {
+                    const camera = cameraData[i];
+                    // Etsitään vastaava preset (mitattu aika) API-datasta
+                    const matchedPreset = cameraPresets.find(preset => preset.id === camera.id);
+
+                    if (matchedPreset) {
+                        // Luodaan elementti aikaleimalle
+                        const timestampElement = document.createElement('p');
+                        timestampElement.className = 'camera-timestamp';
+                        timestampElement.textContent = `: ${matchedPreset.measuredTime}`;
+
+                        // Luodaan elementti kuvalle
+                        const imageElement = document.createElement('img');
+                        imageElement.src = camera.url;
+                        imageElement.alt = `Liikennekamera ${camera.id}`;
+                        imageElement.className = 'camera-image';
+
+                        // Lisätään aikaleima ja kuva kontaineriin
+                        cameraContainer.appendChild(timestampElement);
+                        cameraContainer.appendChild(imageElement);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Virhe haettaessa liikennekameran tietoja:', error);
+                cameraContainer.innerHTML = '<p>Tietoa ei pystytä hakemaan. Yritä myöhemmin uudelleen.</p>';
+            });
+    </script>
+
+</body>
+</html>

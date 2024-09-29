@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toteutuksen tiedot</title>
+
+    <link rel="stylesheet" href="tyyli.css">
+
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="json1_tehtävä.html">Tehtävä 1</a></li>
+            <li><a href="toteutus.html">Toteutus</a></li>
+            <li><a href="tapahtumat.html">Tapahtumat</a></li>
+            <li><a href="saa.html">Sää</a></li>
+            <li><a href="liikennekamera.html">Liikennekamera</a></li>
+            <li><a href="junat.html">Junat</a></li>
+        </ul>
+    </nav>
+
+    <div id="vastaus"></div>
+
+    <script>
+        // Haetaan JSON-data Mocky-palvelusta
+        fetch('https://run.mocky.io/v3/7ad87dcf-eb15-4a22-a7a6-899572a80dfe') // 
+            .then(function(response) {
+                return response.json(); // Muunnetaan vastaus JSON-muotoon
+            })
+            .then(function(data) {
+                tulostaTiedot(data); // Kutsutaan tulostaTiedot-funktiota ja annetaan JSON-data parametrina
+            })
+            .catch(function(error) {
+                document.getElementById("vastaus").innerHTML = "<p>Tietoja ei pystytä hakemaan</p>";
+            });
+
+        // Tulosta JSON-tiedot HTML-sivulle
+        function tulostaTiedot(data) {
+            var teksti = ""; // Luodaan muuttuja tekstin keräämiseksi
+
+            // Toteutuksen tietojen tulostaminen
+            teksti += "<h1>" + data.toteutuksen_nimi + "</h1>";
+            teksti += "<p>Osallistujien lukumäärä: " + data.osallistujien_lukumäärä + "</p>";
+            teksti += "<h3>Osallistujat:</h3><ul>";
+
+            for (var i = 0; i < data.osallistujien_nimet.length; i++) {
+                teksti += "<li>" + data.osallistujien_nimet[i] + "</li>";
+            }
+
+            teksti += "</ul>";
+            teksti += "<p>Alkamisaika: " + data.alkamisaika + "</p>";
+            teksti += "<p>Loppumisaika: " + data.loppumisaika + "</p>";
+            teksti += "<p>Kesto viikkoina: " + data.kesto_viikkoina + "</p>";
+
+            // Kuvan lisääminen
+            teksti += "<p><img src='" + data.kuva + "' alt='Kuva' /></p>";
+
+            // Tulostetaan sisältö HTML-sivulle
+            document.getElementById("vastaus").innerHTML = teksti;
+        }
+    </script>
+</body>
+</html>

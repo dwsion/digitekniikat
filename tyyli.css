@@ -1,0 +1,39 @@
+/* Yleinen asettelu */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    background-color: #b3d2f1; /* Taustan väri: raikas sinertävä */
+    color: #333; /* Tekstin väri: tumma harmaa paremman luettavuuden takaamiseksi */
+    line-height: 1.6; /* Parantaa tekstin luettavuutta */
+}
+
+nav {
+    margin-bottom: 20px; 
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+    background-color: #363a3f; /* Tummanharmaa tausta */
+    padding: 15px;
+    border-radius: 14px; /* Pyöristää kulmat */
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #ecf0f1; /* Vaalea teksti */
+    font-weight: bold;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease; /* Pehmeä siirtymä hover-efektille */
+}
+
+nav ul li a:hover {
+    background-color: #eb11eb; /* Vaaleanpunainen hover-efekti */
+    border-radius: 14px; /* Pyöristää kulmat */
+}
